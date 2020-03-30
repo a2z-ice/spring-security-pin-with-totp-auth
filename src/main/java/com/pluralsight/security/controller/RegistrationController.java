@@ -7,6 +7,7 @@ import com.pluralsight.security.entity.Portfolio;
 import com.pluralsight.security.event.UserRegistrationEvent;
 import com.pluralsight.security.repository.PortfolioRepository;
 import com.pluralsight.security.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,6 @@ public class RegistrationController {
 	private final PortfolioRepository portfolioRepository;
 	private final UserRepository repository;
 	private final boolean TOTP_ENABLED = false;
-
 
 	@GetMapping("/register")
 	public String register(Model model) {

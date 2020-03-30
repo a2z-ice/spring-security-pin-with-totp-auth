@@ -4,8 +4,8 @@ spring:
   mail:
     host: imap.gmail.com
     port: 587
-    username: gmail_user
-    password: gmail_password
+    username: ${email}
+    password: ${password}
     properties:
       mail:
         smtp:
