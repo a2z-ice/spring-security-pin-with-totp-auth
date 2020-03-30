@@ -4,10 +4,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
-import com.pluralsight.security.validation.PasswordConfirmed;
-import com.pluralsight.security.validation.PasswordPolicy;
-import com.pluralsight.security.validation.UniqueEmail;
-import com.pluralsight.security.validation.UniqueUsername;
+import com.pluralsight.security.validation.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @PasswordConfirmed
+@Recaptcha
 public class UserDto {
 	
 	@NotEmpty(message="Please enter your firstname")
