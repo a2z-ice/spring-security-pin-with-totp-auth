@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: crypto
+  mail:
+    host: imap.gmail.com
+    port: 587
+    username: gmail_user
+    password: gmail_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+  data:
+    mongodb:
+      host: localhost
+      port: 30001
+      database: crypto
+
+server:
+  port: 8443
+  ssl:
+    key-store-password: password
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-alias: tomcat
+        
+logging:
+  level:
+    root: INFO
+    com.memorynotfound: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
