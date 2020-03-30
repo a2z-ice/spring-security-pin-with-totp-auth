@@ -1,3 +1,8 @@
+recaptcha:
+  secret:
+    key: ${google.recaptcha.secret.key}
+
+
 spring:
   application:
     name: crypto
