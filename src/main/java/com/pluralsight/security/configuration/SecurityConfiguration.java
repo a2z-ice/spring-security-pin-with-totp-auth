@@ -26,21 +26,23 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AdditionalAuthenticationProvider additionalProvider;
-	@Autowired
-	@Qualifier("userDetailsServiceNoSql")
-	private UserDetailsService userDetailsService;
-
+//	@Autowired
+//	@Qualifier("userDetailsServiceNoSql")
+//	private UserDetailsService userDetailsService;
 	@Autowired
 	private TotpAuthenticationFilter totpAuthFilter;
-
 	@Autowired
 	private AccessDeniedHandlerImpl accessDeniedHandler;
+	@Autowired
+	private PersistentTokenRepository persistentTokenRepository;
 
 	@Override
 	//@formatter:off
@@ -61,10 +63,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.failureUrl("/login-error")
 				.authenticationDetailsSource(new AdditionalAuthenticationDetailSource())
 				.and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+				.and().rememberMe().rememberMeCookieName("remember-me").key("remember-me-key").tokenRepository(persistentTokenRepository)
+				.authenticationSuccessHandler(new AuthenticationSuccessHandlerImpl())
+				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login")
+					.deleteCookies("remember-me")
 				;
-
 	}
 	//@formatter:on
+
+
+
+
+
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring()
@@ -77,10 +87,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth.authenticationProvider(additionalProvider);
 	}
 
-	@Override
-	protected UserDetailsService userDetailsService() {
-		return userDetailsService;
-	}
+//	@Override
+//	protected UserDetailsService userDetailsService() {
+//		return userDetailsService;
+//	}
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		DelegatingPasswordEncoder encoder =  (DelegatingPasswordEncoder)PasswordEncoderFactories.createDelegatingPasswordEncoder();
