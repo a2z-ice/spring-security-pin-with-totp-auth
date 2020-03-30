@@ -35,7 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AdditionalAuthenticationProvider additionalProvider;
 	@Autowired
-//	@Qualifier("userDetailsServiceNoSql")
+	@Qualifier("userDetailsServiceNoSql")
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private TotpAuthenticationFilter totpAuthFilter;
