@@ -34,9 +34,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AdditionalAuthenticationProvider additionalProvider;
-//	@Autowired
+	@Autowired
 //	@Qualifier("userDetailsServiceNoSql")
-//	private UserDetailsService userDetailsService;
+	private UserDetailsService userDetailsService;
 	@Autowired
 	private TotpAuthenticationFilter totpAuthFilter;
 	@Autowired
@@ -87,10 +87,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth.authenticationProvider(additionalProvider);
 	}
 
-//	@Override
-//	protected UserDetailsService userDetailsService() {
-//		return userDetailsService;
-//	}
+	//Used by remember-me
+	@Override
+	protected UserDetailsService userDetailsService() {
+		return userDetailsService;
+	}
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		DelegatingPasswordEncoder encoder =  (DelegatingPasswordEncoder)PasswordEncoderFactories.createDelegatingPasswordEncoder();

@@ -26,7 +26,7 @@ public class AdditionalAuthenticationProvider extends DaoAuthenticationProvider 
 
     @Override
     @Autowired
-    public void setUserDetailsService(@Qualifier("userDetailsServiceNoSql") UserDetailsService userDetailsService) {
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
         super.setUserDetailsService(userDetailsService);
     }
 
