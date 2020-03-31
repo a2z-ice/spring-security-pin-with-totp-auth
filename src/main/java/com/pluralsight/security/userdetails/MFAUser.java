@@ -13,4 +13,6 @@ public class MFAUser extends User {
     }
     @Setter @Getter
     private String securityPin;
+    @Setter @Getter
+    private boolean totpEnabled;
 }

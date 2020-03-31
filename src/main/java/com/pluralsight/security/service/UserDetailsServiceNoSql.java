@@ -50,6 +50,7 @@ public class UserDetailsServiceNoSql implements UserDetailsService {
 				DEFAULT_ACC_NON_LOCKED,
 				buildAuthorities(authorities));
 		springUser.setSecurityPin(user.getSecurityPin());
+		springUser.setTotpEnabled(user.isTotpEnabled());
 		return springUser;
 		//formatter:on
 	}

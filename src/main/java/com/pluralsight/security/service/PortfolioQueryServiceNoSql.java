@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -40,12 +41,37 @@ public class PortfolioQueryServiceNoSql implements PortfolioQueryService {
 	}
 
 	@Override
+	public PortfolioPositionsDto getPortfolioPositions(String id) {
+		List<CryptoCurrencyDto> cryptos = currencyService.getSupportedCryptoCurrencies();
+		Portfolio portfolio = portfolioRepository.findById(id).get();
+		List<PositionDto> positions = calculatePositions(cryptos, portfolio);
+		Map<String, String> cryptoMap = convertCryptoListToMap(cryptos);
+		return new PortfolioPositionsDto("", "", positions,cryptoMap);
+	}
+
+	@Override
 	public ListTransactionsDto getPortfolioTransactions() {
 		Portfolio portfolio = this.portfolioRepository.findByUsername(getUsername());
 		List<Transaction> transactions = portfolio.getTransactions();
 		return createListTransactionsResponse(getUsername(), transactions);
 	}
-	
+
+	@Override
+	public PortfolioPositionsDto getPortfolioPositionsForUser(String username) {
+		List<CryptoCurrencyDto> cryptos = currencyService.getSupportedCryptoCurrencies();
+		Portfolio portfolio = portfolioRepository.findByUsername(username);
+		List<PositionDto> positions = calculatePositions(cryptos, portfolio);
+		Map<String, String> cryptoMap = convertCryptoListToMap(cryptos);
+		return new PortfolioPositionsDto("", "", positions, cryptoMap);
+
+	}
+
+	@Override
+	public List<String> getPortfolioIds() {
+		List<Portfolio> portfolios = this.portfolioRepository.findAll();
+		return portfolios.stream().map(Portfolio::getId).collect(Collectors.toList());
+	}
+
 	private List<PositionDto> calculatePositions(List<CryptoCurrencyDto> cryptos, Portfolio portfolio) {
 		List<PositionDto> positions = new ArrayList<>();
 		for(CryptoCurrencyDto crypto : cryptos) {

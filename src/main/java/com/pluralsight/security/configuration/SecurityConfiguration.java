@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -44,35 +45,54 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private AuthenticationSuccessHandler oauth2authSuccessHandler;
 
 	@Override
-	//@formatter:off
 	protected void configure(HttpSecurity http) throws Exception {
-		http.addFilterBefore(totpAuthFilter, UsernamePasswordAuthenticationFilter.class)
+	//@formatter:off
+		http
+			.addFilterBefore(totpAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler)
+				.and()
+				.formLogin().loginPage("/login")
+					.successHandler(new AuthenticationSuccessHandlerImpl())
+					.failureUrl("/login-error")
+					.authenticationDetailsSource(new AdditionalAuthenticationDetailSource())
+					.and()
+				.rememberMe()
+					.authenticationSuccessHandler(new AuthenticationSuccessHandlerImpl())
+					.tokenRepository(persistentTokenRepository)
+					.and()
+				.oauth2Login()
+					.loginPage("/login")
+					.successHandler(oauth2authSuccessHandler)
+					.and()
 				.authorizeRequests()
-				.antMatchers(
-						"/register", "/login","/login-error",
-						"/login-verified","/verify/email")
-					.permitAll()
-				.antMatchers("/totp-login", "/totp-login-error")
-					.hasAnyAuthority(Authorities.TOTP_AUTH_AUTHORITY)
-				.anyRequest()
-				.hasRole("USER").and()
-				.formLogin()
-				.loginPage("/login")
-				.successHandler(new AuthenticationSuccessHandlerImpl())
-				.failureUrl("/login-error")
-				.authenticationDetailsSource(new AdditionalAuthenticationDetailSource())
-				.and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-				.and().rememberMe().rememberMeCookieName("remember-me").key("remember-me-key").tokenRepository(persistentTokenRepository)
-				.authenticationSuccessHandler(new AuthenticationSuccessHandlerImpl())
-				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login")
-					.deleteCookies("remember-me")
+					.mvcMatchers(
+							"/register", "/login","/login-error",
+							"/login-verified","/verify/email").permitAll()
+					.mvcMatchers("/totp-login", "/totp-login-error").hasAnyAuthority(Authorities.TOTP_AUTH_AUTHORITY)
+					.mvcMatchers("/portfolio**","/account/**").hasRole("USER")
+					.mvcMatchers(HttpMethod.POST,"/support/admin/**")
+						//if user loggedin anonymously or remember-me the fullyAuthenticated method return false
+//						.fullyAuthenticated() // No role assigned to assign role do following
+						.access("isFullyAuthenticated() and hasRole('ADMIN')")
+					.mvcMatchers("/support/**").hasAnyRole("USER", "ADMIN")
+					.mvcMatchers("/api/users").hasRole("ADMIN")
+					.mvcMatchers("/api/users/{username}/portfolio")
+						//access allow spring security expression so all expression syntax will be allowed
+						//logical(&& || !), relational(!= == <= >=), conditional and regex operators
+						//#username reference to {username} of url /api/users/{username}/portfolio
+						//.access("hasRole('ADMIN') || hasRole('USER') && #username == principal.username")
+						// the above approach is hard to read the most readable option is to create a bean object like following
+						//Bean approach, where bean name started with lowercase. Now the control is yours
+						.access("@isPortfolioOwnerOrAdmin.check(#username)")
+
+					.anyRequest().denyAll()
+
 				//oauth2Login create authenticated principal with  USER Role(ROLE_USER) to customize roles use
 				// .and().oauth2Login().authorizationEndpoint().authorizationRequestRepository(authorizationRequestRepository)
-				.and().oauth2Login().loginPage("/login")
-					.successHandler(oauth2authSuccessHandler)
 				;
-	}
 	//@formatter:on
+	}
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
@@ -94,7 +114,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		DelegatingPasswordEncoder encoder =  (DelegatingPasswordEncoder)PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		encoder.setDefaultPasswordEncoderForMatches(new BCryptPasswordEncoder());
+		//encoder.setDefaultPasswordEncoderForMatches(new BCryptPasswordEncoder());
 		return encoder;
 	}
 	@Bean

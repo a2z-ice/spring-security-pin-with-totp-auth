@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <body>
@@ -17,9 +18,10 @@
 					<li class="nav-item">
 						<a class="nav-link" href="/support">Support</a>
 					</li>
-					<li class="nav-item">
+					<li sec:authorize-expr="hasRole('ROLE_ADMIN')" class="nav-item">
 						<a class="nav-link" href="/support/admin">Admin</a>
 					</li>
+
 					<li class="nav-item">
 						<a class="nav-link" href="/account">Account</a>
 					</li>`
