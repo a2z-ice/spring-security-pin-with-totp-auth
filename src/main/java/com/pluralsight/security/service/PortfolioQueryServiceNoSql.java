@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -57,6 +59,14 @@ public class PortfolioQueryServiceNoSql implements PortfolioQueryService {
 	}
 
 	@Override
+
+	//@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #username == principal.username)")
+	@PreAuthorize("@isPortfolioOwnerOrAdmin.check(#username)")
+	// or use following which is full controlled
+	//Post authorize is not very good option because it is alloys good to check prior method call
+	//unless we need to validate with return object
+//	@PostAuthorize("hasRole('ADMIN') or (hasRole('USER') and returnObject.username == principal.username)")
+
 	public PortfolioPositionsDto getPortfolioPositionsForUser(String username) {
 		List<CryptoCurrencyDto> cryptos = currencyService.getSupportedCryptoCurrencies();
 		Portfolio portfolio = portfolioRepository.findByUsername(username);

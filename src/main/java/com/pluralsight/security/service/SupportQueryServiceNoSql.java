@@ -3,6 +3,8 @@ package com.pluralsight.security.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.pluralsight.security.annotations.FilterOutCurrentUser;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,10 @@ public class SupportQueryServiceNoSql implements SupportQueryService {
 	private final SupportQueryRepository supportRepository;
 
 	@Override
+	//Filter out any Support query which is not belong to this user
+//	@PreAuthorize("filterObject.username == authentication.username and !filterObject.resolved")
+	//Shorthand for above expression by creating following custom Annotation
+	@FilterOutCurrentUser
 	public List<SupportQueryDto> getSupportQueriesForUser() {
 		System.out.println(getUsername());
 		List<SupportQuery> supportQueries = supportRepository.findByUsername(getUsername());

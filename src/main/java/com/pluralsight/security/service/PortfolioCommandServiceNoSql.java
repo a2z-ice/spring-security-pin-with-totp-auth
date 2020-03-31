@@ -3,6 +3,7 @@ package com.pluralsight.security.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class PortfolioCommandServiceNoSql implements PortfolioCommandService {
 	private final CryptoCurrencyRepository currencyRepository;
 	
 	@Override
+	//The filter object will validate each user from request transaction dto if not found
+	//it will remove the user
+	@PreAuthorize("hasRole('ADMIN') or filterObject.username == authentication.username")
 	public void addTransactionToPortfolio(AddTransactionToPortfolioDto request) {
 		Portfolio portfolio = portfolioRepositiory.findByUsername(getUsername());
 		Transaction transaction = createTransactionEntity(request);
