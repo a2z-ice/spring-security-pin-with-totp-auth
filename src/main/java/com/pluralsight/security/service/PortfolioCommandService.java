@@ -6,5 +6,6 @@ public interface PortfolioCommandService {
 
 	void addTransactionToPortfolio(AddTransactionToPortfolioDto request);
 	void removeTransactionFromPortfolio(String transactionId);
-	
+    boolean userHasAportfolio(String username);
+	void createNewPortfolio(String username);
 }

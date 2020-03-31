@@ -24,6 +24,13 @@ spring:
       host: localhost
       port: 30001
       database: crypto
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${google.oauth2.crypto-portfolio.client.id}
+            client-secret: ${google.oauth2.crypto-portfolio.client.secret}
 
 server:
   port: 8443

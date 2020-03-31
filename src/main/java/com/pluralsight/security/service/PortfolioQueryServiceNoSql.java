@@ -18,6 +18,7 @@ import com.pluralsight.security.model.PortfolioPositionsDto;
 import com.pluralsight.security.model.PositionDto;
 import com.pluralsight.security.model.TransactionDetailsDto;
 import com.pluralsight.security.repository.PortfolioRepository;
+import static com.pluralsight.security.util.AuthenticationUtil.getUsername;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +29,7 @@ public class PortfolioQueryServiceNoSql implements PortfolioQueryService {
 	private final CurrencyQueryService currencyService;
 	private final PortfolioRepository portfolioRepository;
 	private final PricingService pricingService;
-	
+
 	@Override
 	public PortfolioPositionsDto getPortfolioPositions() {
 		List<CryptoCurrencyDto> cryptos = currencyService.getSupportedCryptoCurrencies();
@@ -93,14 +94,7 @@ public class PortfolioQueryServiceNoSql implements PortfolioQueryService {
 		return quantity;
 	}
 	
-	private String getUsername() {
-		Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if(principle instanceof String) {
-			return principle.toString();
-		}
-		return ((User)principle).getUsername();
-	}
-	
+
 	private ListTransactionsDto createListTransactionsResponse(String username, List<Transaction> transactions) {
 		List<TransactionDetailsDto> transationDetails = new ArrayList<>();
 		for(Transaction transaction : transactions) {

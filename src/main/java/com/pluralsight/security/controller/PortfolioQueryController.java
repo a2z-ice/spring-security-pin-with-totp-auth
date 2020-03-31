@@ -35,7 +35,7 @@ public class PortfolioQueryController {
 	public String index() {
 		return "redirect:/portfolio";
 	}
-	
+
 	@GetMapping("/portfolio")
 	public ModelAndView positions(HttpServletResponse response) {
 		ModelAndView model = new ModelAndView();

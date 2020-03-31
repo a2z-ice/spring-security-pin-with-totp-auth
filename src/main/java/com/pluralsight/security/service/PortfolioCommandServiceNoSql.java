@@ -1,6 +1,7 @@
 package com.pluralsight.security.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -20,25 +21,35 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class PortfolioCommandServiceNoSql implements PortfolioCommandService {
 
-	private final PortfolioRepository portfolioRepostiory;
+	private final PortfolioRepository portfolioRepositiory;
 	private final CryptoCurrencyRepository currencyRepository;
 	
 	@Override
 	public void addTransactionToPortfolio(AddTransactionToPortfolioDto request) {
-		Portfolio portfolio = portfolioRepostiory.findByUsername(getUsername());
+		Portfolio portfolio = portfolioRepositiory.findByUsername(getUsername());
 		Transaction transaction = createTransactionEntity(request);
 		portfolio.addTransaction(transaction);
-		portfolioRepostiory.save(portfolio);
+		portfolioRepositiory.save(portfolio);
 	}
 	
 	@Override
 	public void removeTransactionFromPortfolio(String transactionId) {
-		Portfolio portfolio = portfolioRepostiory.findByUsername(getUsername());
+		Portfolio portfolio = portfolioRepositiory.findByUsername(getUsername());
 		Transaction transacion = portfolio.getTransactionById(transactionId);
 		portfolio.deleteTransaction(transacion);
-		portfolioRepostiory.save(portfolio);
+		portfolioRepositiory.save(portfolio);
 	}
-	
+
+	@Override
+	public boolean userHasAportfolio(String username) {
+		return portfolioRepositiory.existsByUsername(username);
+	}
+
+	@Override
+	public void createNewPortfolio(String username) {
+		portfolioRepositiory.save(new Portfolio(username, new ArrayList<>()));
+	}
+
 	private String getUsername() {
 		Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return ((User)principle).getUsername();

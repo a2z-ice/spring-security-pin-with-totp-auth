@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -38,6 +39,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private AccessDeniedHandlerImpl accessDeniedHandler;
 	@Autowired
 	private PersistentTokenRepository persistentTokenRepository;
+	@Autowired
+	@Qualifier("oauth2authSuccessHandler")
+	private AuthenticationSuccessHandler oauth2authSuccessHandler;
 
 	@Override
 	//@formatter:off
@@ -62,13 +66,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.authenticationSuccessHandler(new AuthenticationSuccessHandlerImpl())
 				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login")
 					.deleteCookies("remember-me")
+				//oauth2Login create authenticated principal with  USER Role(ROLE_USER) to customize roles use
+				// .and().oauth2Login().authorizationEndpoint().authorizationRequestRepository(authorizationRequestRepository)
+				.and().oauth2Login().loginPage("/login")
+					.successHandler(oauth2authSuccessHandler)
 				;
 	}
 	//@formatter:on
-
-
-
-
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
